@@ -1,6 +1,6 @@
 import timeit
 from functools import wraps
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 
 def timer(
@@ -31,6 +31,7 @@ def timer(
     def decorator(f: Callable):
         @wraps(f)  # retain original function metadata
         def wrapper(*args, **kwargs):
+            result: Any = None
             if num_iterations == 1:
                 time_start = timeit.default_timer()
                 result = f(*args, **kwargs)
