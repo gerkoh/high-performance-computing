@@ -1,0 +1,14 @@
+[project]
+name = "high-performance-computing"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "aiohttp>=3.13.3",
+    "fastapi[standard-no-fastapi-cloud-cli]>=0.135.1",
+    "marimo>=0.19.7",
+    "numpy>=2.4.0",
+    "pandas>=2.3.3",
+    "tqdm>=4.67.3",
+]
