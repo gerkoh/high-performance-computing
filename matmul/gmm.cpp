@@ -32,7 +32,7 @@ int main()
 {
     // Example arrays
     std::array<std::array<double, 3>, 2> M{{{1, 2, 3}, {4, 5, 6}}};      // 2x3
-    std::array<std::array<double, 2>, 3> N{{{1, 4}, {2, 5}, 3, 6}}; // 3x2
+    std::array<std::array<double, 2>, 3> N{{{1, 4}, {2, 5}, {3, 6}}};    // 3x2
 
     const auto result = gmm_loop_optimized<double, 2, 3, 3, 2>(M, N);
 
