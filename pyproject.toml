@@ -21,3 +21,6 @@ build-backend = "uv_build"
 [tool.uv.build-backend]
 module-root = "."
 module-name = "profiling"
+
+[tool.ruff]
+ignore = ["I001"]
