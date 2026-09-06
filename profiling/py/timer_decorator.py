@@ -1,14 +1,17 @@
 import timeit
+from collections.abc import Callable, Mapping
 from functools import wraps
-from typing import Callable, Optional, Any
+from typing import Any
 
 
 def timer(
-    func: Optional[Callable] = None,
+    func: Callable | None = None,
     *,
     num_iterations: int = 1,
     print_precision: int = 10,
     quiet: bool = False,
+    print_fn_metadata: bool = False,
+    metadata: Mapping[str, Any] | Callable[..., Mapping[str, Any]] | None = None,
 ):
     """
     Decorator to calculate the wall clock time of a function.
@@ -20,6 +23,8 @@ def timer(
         num_iterations: Number of iterations to execute the function.
         print_precision: Decimal places to display in the timing output of the wall clock time.
         quiet: If True, suppress the print output for each iteration.
+        print_fn_metadata: If True, print the wrapped function's metadata before timing.
+        metadata: A mapping or callable returning a mapping of custom metadata to print.
 
     Returns:
         Wrapped function with timing functionality.
@@ -32,6 +37,19 @@ def timer(
         @wraps(f)  # retain original function metadata
         def wrapper(*args, **kwargs):
             result: Any = None
+            if print_fn_metadata:
+                print(f"Function: {f.__qualname__}")
+                print(f"Module: {f.__module__}")
+                print(f"Docstring: {f.__doc__}")
+            if metadata is not None:
+                call_metadata = (
+                    metadata(*args, **kwargs) if callable(metadata) else metadata
+                )
+                if not isinstance(call_metadata, Mapping):
+                    raise TypeError("metadata must be a mapping or return a mapping")
+                for key, value in call_metadata.items():
+                    print(f"{key}: {value}")
+
             if num_iterations == 1:
                 time_start = timeit.default_timer()
                 result = f(*args, **kwargs)
