@@ -8,7 +8,16 @@ dependencies = [
     "aiohttp>=3.13.3",
     "fastapi[standard-no-fastapi-cloud-cli]>=0.135.1",
     "marimo>=0.19.7",
+    "numba>=0.67.0",
     "numpy>=2.4.0",
     "pandas>=2.3.3",
     "tqdm>=4.67.3",
 ]
+
+[build-system]
+requires = ["uv_build>=0.12.10,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = "."
+module-name = "profiling"
