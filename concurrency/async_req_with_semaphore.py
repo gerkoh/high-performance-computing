@@ -1,5 +1,6 @@
-import asyncio
 import argparse
+import asyncio
+
 import aiohttp
 from tqdm import tqdm
 
@@ -10,19 +11,22 @@ async def worker(
     semaphore: asyncio.Semaphore,
     session: aiohttp.ClientSession,
     prog_bar: tqdm,
+    inflight_bar: tqdm,
 ):
-    # response: ResponseModel | None = None
-
     async with semaphore:
+        inflight_bar.update(1)
         worker_id = await worker_ids.get()
-        prog_bar.write(f"Request {req_id} handled by: worker {worker_id}")
-        # execute I/O request - simulates session.get(...)
-        # await asyncio.sleep(random.uniform(1, 5))
-        async with session.get("/") as response:
-            # data = await response.json()
-            prog_bar.update(1)
-            prog_bar.write(f"Request {req_id} completed by: worker {worker_id}")
-        worker_ids.put_nowait(worker_id)
+        try:
+            prog_bar.write(f"Request {req_id} handled by: worker {worker_id}")
+            # execute I/O request - simulates session.get(...)
+            # await asyncio.sleep(delay=random.uniform(1, 5))
+            async with session.get(f"/req_id{req_id}-worker_id{worker_id}") as _:
+                # data = await response.json()
+                prog_bar.update(1)
+                prog_bar.write(f"Request {req_id} completed by: worker {worker_id}")
+        finally:
+            worker_ids.put_nowait(worker_id)  # safe because worker_ids is unlimited
+            inflight_bar.update(-1)
 
 
 async def main(
@@ -31,6 +35,12 @@ async def main(
     session = aiohttp.ClientSession(base_url="http://localhost:8000")
 
     prog_bar = tqdm(total=total_requests)
+    inflight_bar = tqdm(
+        total=num_workers,
+        desc="In flight",
+        position=1,
+        leave=False,
+    )
 
     # semaphore approach
     worker_ids = asyncio.Queue()
@@ -44,14 +54,14 @@ async def main(
                 semaphore=semaphore,
                 session=session,
                 prog_bar=prog_bar,
+                inflight_bar=inflight_bar,
             )
             for i in range(1, total_requests + 1)
         ]
         await asyncio.gather(*work)
 
     prog_bar.close()
-
-    return
+    inflight_bar.close()
 
 
 if __name__ == "__main__":
