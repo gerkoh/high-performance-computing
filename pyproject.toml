@@ -22,5 +22,25 @@ build-backend = "uv_build"
 module-root = "."
 module-name = "profiling"
 
+# ==============================================================================
+# Ruff
+# ==============================================================================
 [tool.ruff]
-ignore = ["I001"]
+line-length = 88
+indent-width = 4
+target-version = "py314"
+
+[tool.ruff.lint]
+extend-select = [
+    "B",  # flake8-bugbear
+    "I",  # isort
+    "UP", # pyupgrade
+]
+fixable = ["ALL"]
+unfixable = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
